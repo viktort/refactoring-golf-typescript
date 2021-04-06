@@ -1,12 +1,13 @@
 import {Incalculable} from "./incalculable";
 
-export class Money<A, B> {
-    public first: A;
-    public second: B;
+export class Money {
+    public value: number;
+    public currency: string;
 
-    constructor(first: A, second: B) {
-        this.first = first;
-        this.second = second;
+
+    constructor(value: number, currency: string) {
+        this.value = value;
+        this.currency = currency;
     }
 }
 
@@ -17,28 +18,28 @@ export class Takehomecalculator {
         this.percent = percent;
     }
 
-    netAmount(first: Money<number, string>, ...rest : Money<number, string>[] ): Money<number, string> {
+    netAmount(first: Money, ...rest : Money[] ): Money {
 
-        const pairs: Array<Money<number, string>> = Array.from(rest);
-        let total: Money<number, string> = first
+        const monies: Array<Money> = Array.from(rest);
+        let total: Money = first
 
-        for (let next of pairs) {
-            if (next.second !== total.second) {
+        for (let next of monies) {
+            if (next.currency !== total.currency) {
                 throw new Incalculable()
             }
         }
 
-        for (const next of pairs) {
-            total = new Money<number, string>(total.first + next.first, next.second)
+        for (const next of monies) {
+            total = new Money(total.value + next.value, next.currency)
         }
 
-        const amount:number = total.first * (this.percent / 100.0 );
-        const tax: Money<number, string> = new Money(Math.trunc(amount), first.second);
+        const amount:number = total.value * (this.percent / 100.0 );
+        const tax: Money = new Money(Math.trunc(amount), first.currency);
 
-        if (total.second !== tax.second) {
+        if (total.currency !== tax.currency) {
             throw new Incalculable()
         }
-        return new Money(total.first - tax.first, first.second)
+        return new Money(total.value - tax.value, first.currency)
     }
 
 }
